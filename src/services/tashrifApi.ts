@@ -16,7 +16,7 @@ import { stripArabicDiacritics, speakArabic } from '../utils/arabicText';
 // Re-export utilities
 export { stripArabicDiacritics, speakArabic };
 
-const BASE_URL = 'https://tashrif-digital.vercel.app';
+const BASE_URL = typeof window !== 'undefined' ? '' : 'https://tashrif-digital.vercel.app';
 
 /**
  * Fetch verb suggestions based on raw unvocalized Arabic query

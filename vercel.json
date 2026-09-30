@@ -1,0 +1,7 @@
+{
+  "rewrites": [
+    { "source": "/suggest", "destination": "/api/index.py" },
+    { "source": "/conjugate", "destination": "/api/index.py" },
+    { "source": "/api/(.*)", "destination": "/api/index.py" }
+  ]
+}

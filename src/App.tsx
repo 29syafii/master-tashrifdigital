@@ -32,6 +32,8 @@ import {
 import {
   loadVerbDatabase,
   searchDatabase,
+  lookupByVocalized,
+  lookupByUnvocalized,
   FUTURE_TYPE_LABELS,
   isDatabaseLoaded,
   getDatabaseSize,
@@ -255,24 +257,43 @@ export default function App() {
     overrideFutureType?: FutureType,
     overrideTransitive?: boolean,
   ) => {
-    setSelectedVerb(verb);
-    setSearchQuery(verb);
-    setShowSuggestions(false);
+    let resolvedVerb = verb.trim();
+    let fType = overrideFutureType;
+    let isTrans = overrideTransitive;
 
-    const fType = overrideFutureType ?? futureType;
-    if (overrideFutureType) {
-      setFutureType(overrideFutureType);
+    // Check if we can find exact or unvocalized match in Qutrub database
+    const exactMatch = lookupByVocalized(resolvedVerb);
+    const unvocMatch = !exactMatch ? lookupByUnvocalized(resolvedVerb.replace(/[\u064B-\u065F\u0670]/g, ''))[0] : undefined;
+    const match = exactMatch || unvocMatch;
+
+    if (match) {
+      resolvedVerb = match.v;
+      if (!fType) {
+        fType = FUTURE_TYPE_LABELS[match.ft] as FutureType;
+      }
+      if (isTrans === undefined) {
+        isTrans = match.tr;
+      }
     }
 
-    const isTrans = overrideTransitive !== undefined ? overrideTransitive : transitive;
-    if (overrideTransitive !== undefined) {
-      setTransitive(overrideTransitive);
+    const effectiveFType = fType ?? futureType;
+    const effectiveTrans = isTrans !== undefined ? isTrans : transitive;
+
+    setSelectedVerb(resolvedVerb);
+    setSearchQuery(resolvedVerb);
+    setShowSuggestions(false);
+
+    if (fType) {
+      setFutureType(fType);
+    }
+    if (isTrans !== undefined) {
+      setTransitive(isTrans);
     }
 
     executeConjugation({
-      verb,
-      future_type: fType,
-      transitive: isTrans,
+      verb: resolvedVerb,
+      future_type: effectiveFType,
+      transitive: effectiveTrans,
       passive,
     });
   };
