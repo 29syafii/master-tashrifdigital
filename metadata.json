@@ -1,0 +1,8 @@
+{
+  "name": "Master Tashrif Digital",
+  "description": "Aplikasi konjugasi verba Arab interaktif dengan pencarian cerdas, autocomplete saran kata, dan tabel tashrif 14 dhamir lengkap.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}

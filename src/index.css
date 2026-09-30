@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #d1e4de;
+    color: #1a332d;
+  }
+}
+
+.font-arabic {
+  font-family: var(--font-arabic-family, 'Noto Naskh Arabic', 'Amiri', 'Traditional Arabic', serif);
+}
+
+.font-arabic-noto {
+  font-family: 'Noto Naskh Arabic', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.font-arabic-amiri {
+  font-family: 'Amiri', 'Traditional Arabic', serif;
+}
+
+.font-arabic-scheherazade {
+  font-family: 'Scheherazade New', 'Amiri', serif;
+}
+
+.font-naskh {
+  font-family: 'Noto Naskh Arabic', 'Amiri', system-ui, sans-serif;
+}
+
+/* Flexible text scale container */
+[data-text-scale="sm"] {
+  --arabic-scale: 0.88;
+  --arabic-table-size: 13px;
+  --arabic-title-size: 26px;
+}
+
+[data-text-scale="md"] {
+  --arabic-scale: 1;
+  --arabic-table-size: 16px;
+  --arabic-title-size: 32px;
+}
+
+[data-text-scale="lg"] {
+  --arabic-scale: 1.18;
+  --arabic-table-size: 19px;
+  --arabic-title-size: 38px;
+}
+
+[data-text-scale="xl"] {
+  --arabic-scale: 1.38;
+  --arabic-table-size: 23px;
+  --arabic-title-size: 44px;
+}
+
+/* Smooth font rendering */
+.font-arabic, .font-arabic-noto, .font-arabic-amiri, .font-arabic-scheherazade {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Red diacritics / vocalization styling for Arabic */
+.arabic-vocalized {
+  font-feature-settings: "cv01" 1, "cv02" 1;
+}
+
+/* Custom scrollbars matching Gambar 1 & Gambar 2 */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #dcece7;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb {
+  background: #9bc5b9;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1f705e;
+}
