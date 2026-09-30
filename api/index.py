@@ -1,26 +1,25 @@
 import sys
 import os
+import traceback
 from typing import Optional
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Add local fallback paths if libqutrub is packaged locally
 current_dir = os.path.dirname(os.path.abspath(__file__))
 lib_dir = os.path.join(current_dir, "_lib")
 if os.path.exists(lib_dir):
     sys.path.insert(0, lib_dir)
 
+import_error = None
 try:
     import libqutrub.conjugator as conjugator
     import libqutrub.verb_valid as verb_valid
-except ImportError:
-    # If not in top-level sys.path, check support dirs
-    support_dir = os.path.join(lib_dir, "pyarabic")
-    if os.path.exists(support_dir):
-        sys.path.insert(0, support_dir)
-    import libqutrub.conjugator as conjugator
-    import libqutrub.verb_valid as verb_valid
+except Exception as e:
+    import_error = f"{e}\n{traceback.format_exc()}"
+    conjugator = None
+    verb_valid = None
 
 app = FastAPI(
     title="Tashrif Digital Qutrub API",
@@ -47,11 +46,23 @@ class ConjugationRequest(BaseModel):
 
 
 @app.get("/")
+@app.get("/api")
 def root():
     return {
         "status": "ok",
         "service": "Tashrif Digital Qutrub API",
-        "version": "1.0.0",
+        "import_error": import_error,
+        "python_version": sys.version,
+    }
+
+
+@app.get("/api/debug")
+def debug():
+    return {
+        "import_error": import_error,
+        "sys_path": sys.path,
+        "current_dir": current_dir,
+        "lib_dir_exists": os.path.exists(lib_dir),
     }
 
 
@@ -60,6 +71,9 @@ def root():
 def suggest(
     query: str = Query(..., description="Potongan huruf verba tanpa harakat, mis. 'صل'")
 ):
+    if import_error or not verb_valid:
+        return {"query": query, "suggestions": [], "error": import_error}
+
     trimmed = query.strip()
     if not trimmed:
         return {"query": query, "suggestions": []}
@@ -83,6 +97,12 @@ def conjugate(
     transitive: bool = Query(True, description="Apakah verba transitif (muta'addi)"),
     passive: bool = Query(True, description="Sertakan bentuk majhul/pasif"),
 ):
+    if import_error or not conjugator:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Qutrub engine failed to load: {import_error}",
+        )
+
     trimmed = verb.strip()
     if not trimmed:
         raise HTTPException(status_code=400, detail="Parameter 'verb' tidak boleh kosong.")
