@@ -7,11 +7,6 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-current_dir = os.path.dirname(os.path.abspath(__file__))
-lib_dir = os.path.join(current_dir, "_lib")
-if os.path.exists(lib_dir):
-    sys.path.insert(0, lib_dir)
-
 import_error = None
 try:
     import libqutrub.conjugator as conjugator
@@ -61,8 +56,7 @@ def debug():
     return {
         "import_error": import_error,
         "sys_path": sys.path,
-        "current_dir": current_dir,
-        "lib_dir_exists": os.path.exists(lib_dir),
+        "python_version": sys.version,
     }
 
 
